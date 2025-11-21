@@ -1,0 +1,38 @@
+hello:
+do;
+
+declare c$write literally '02h';
+declare p$terminate literally '00h';
+declare cr literally '13';
+declare lf literally '10';
+
+declare plm label public;
+
+mon1: procedure (func,info) external;
+    declare func byte;
+    declare info address;
+end mon1;
+
+declare p$tail address initial (80h);
+declare tail based p$tail (1) byte;
+
+declare i byte;
+declare c byte;
+
+plm:
+
+    c = tail(0);
+    i = 1;
+    do while tail(i) <= ' ';
+        i = i + 1;
+    end;
+    do while i <= c;
+        call mon1(c$write, tail(i));
+        i = i + 1;
+    end;
+    call mon1(c$write, cr);
+    call mon1(c$write, lf);
+
+    call mon1(p$terminate, 0);
+
+end hello;
