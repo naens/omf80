@@ -212,5 +212,6 @@ __marimo__/
 *.hex
 *.lst
 *.mod
+*.loc
 *.obj
-*.tmp
+
