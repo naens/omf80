@@ -1156,7 +1156,6 @@ def module_adjust(module, code_start=0, stack_size=2):
     code_length = module['segments'][CODE_SEGMENT]['seg_length']
     data_start = code_start + code_length + stack_size
     module['segments'][STACK_SEGMENT]['seg_length'] = stack_size
-    print(stack_size)
     for cdef in module["content_definitions"]:
         data = cdef['data']
         cdef_offset = cdef['offset']
@@ -1184,7 +1183,6 @@ def add_at(arr1, offset, arr2):
 def module_to_bin(module):
     code = bytearray()
     stack = bytearray(module["segments"][STACK_SEGMENT]["seg_length"])
-    print(len(stack))
     data = bytearray()
     for cdef in module["content_definitions"]:
         if cdef["seg_id"] == CODE_SEGMENT:
