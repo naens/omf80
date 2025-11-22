@@ -46,8 +46,8 @@ pr$num: procedure (n) public;
 end pr$num;
 
 newline: procedure public;
-    call mon1(2, 13);
-    call mon1(2, 10);
+    call mon1(c$write, 13);
+    call mon1(c$write, 10);
 end newline;
 
 terminate: procedure public;
