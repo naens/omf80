@@ -19,10 +19,18 @@ class HexIntPrettyPrinter(pprint.PrettyPrinter):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("files", nargs='*')
+    parser.add_argument("-o", "--out", help="name of the binary output file")
+    parser.add_argument("--code", help="start of the code segment")
+    parser.add_argument("--stack", help="size of the stack segment")
+
     args = parser.parse_args()
-    pprinter = HexIntPrettyPrinter()
 
     files = args.files
+    file_out = args.out
+    code_start = read_int(args.code)
+    stack_size = read_int(args.stack)
+
+    pprinter = HexIntPrettyPrinter()
 
     lst = []
     for file in files:
@@ -35,20 +43,12 @@ def main():
     module = omf80.link(lst)
 #    pprinter.pprint(module)
 
-    code_start = 0x100
-    code_length = module['segments'][omf80.CODE_SEGMENT]['seg_length']
-    stack_size = 0x64
-    data_start = code_start + code_length + stack_size
-    omf80.module_adjust(module, code_start=code_start, data_start=data_start)
-    
+    omf80.module_adjust(module, code_start=code_start, stack_size=stack_size)
     bin_data = omf80.module_to_bin(module)
 
-    name = module['name'].lower()
-    filename = f'{name}.tmp.bin'
-    with open(filename, 'wb') as file:
+    with open(file_out, 'wb') as file:
         file.write(bin_data)
         file.close()
-    print(f'written into {filename}')
     
 
 if __name__ == "__main__":

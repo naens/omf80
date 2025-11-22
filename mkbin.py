@@ -47,10 +47,7 @@ def main():
     mrecs = records[:-1]
     module = omf80.records_to_module(mrecs)
 
-    code_length = module['segments'][omf80.CODE_SEGMENT]['seg_length']
-    data_start = code_start + code_length + stack_size
-
-    omf80.module_adjust(module, code_start=code_start, data_start=data_start)
+    omf80.module_adjust(module, code_start=code_start, stack_size=stack_size)
     bin_data = omf80.module_to_bin(module)
 
     bin_file = open(file_out, "wb")
