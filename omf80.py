@@ -1152,21 +1152,46 @@ def add_eof(records):
 #    code_length = module['segments'][omf80.CODE_SEGMENT]['seg_length']
 #    stack_size = 0x64
 #    data_start = code_start + code_length + stack_size
-def module_adjust(module, code_start=0, data_start=0):
+def module_adjust(module, code_start=0, stack_size=2):
+    code_length = module['segments'][CODE_SEGMENT]['seg_length']
+    data_start = code_start + code_length + stack_size
+    module['segments'][STACK_SEGMENT]['seg_length'] = stack_size
+    print(stack_size)
     for cdef in module["content_definitions"]:
         data = cdef['data']
         cdef_offset = cdef['offset']
-        for (seg_id, lhb), offsets in cdef.get('internal', {}).items():
-            for offset in offsets:
-                if seg_id == CODE_SEGMENT:
-                    add16(data, offset-cdef_offset, code_start)
-                elif seg_id == DATA_SEGMENT or seg_id == STACK_SEGMENT:
-                    add16(data, offset-cdef_offset, data_start)
-                else:
-                    error("module adjust: unknown segment")
+        if cdef["seg_id"] == CODE_SEGMENT:
+            for (seg_id, lhb), offsets in cdef.get('internal', {}).items():
+                for offset in offsets:
+                    if seg_id == CODE_SEGMENT:
+                        add16(data, offset-cdef_offset, code_start)
+                    elif seg_id == DATA_SEGMENT or seg_id == STACK_SEGMENT:
+                        add16(data, offset-cdef_offset, data_start)
+                    else:
+                        error("module adjust: unknown segment")
+    # do not adjust cdef['offset']: it represents the offset
+    # from the beginning of the segment
+
+# insert arr2 into arr1 at offset
+# if needed, insert zeros
+# if needed, extend arr1
+def add_at(arr1, offset, arr2):
+    offs_end = offset + len(arr2)
+    if len(arr1) < offs_end:
+        arr1 += bytearray([0] * (offs_end - len(arr1)))
+    arr1[offset:offs_end] = arr2
 
 def module_to_bin(module):
-    result = bytearray()
+    code = bytearray()
+    stack = bytearray(module["segments"][STACK_SEGMENT]["seg_length"])
+    print(len(stack))
+    data = bytearray()
     for cdef in module["content_definitions"]:
-        result += cdef["data"]
-    return result
+        if cdef["seg_id"] == CODE_SEGMENT:
+            add_at(code, cdef["offset"], cdef["data"])
+        elif cdef["seg_id"] == DATA_SEGMENT:
+            add_at(data, cdef["offset"], cdef["data"])
+    if len(data) == 0:
+        return code
+    else:
+        return code + stack + data
