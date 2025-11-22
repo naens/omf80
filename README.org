@@ -1,0 +1,10 @@
+#+TITLE: OMF-80
+
+This repository contains some scripts to work with OMF-80 files.
+
+ * ~print.py~ displays the contents of an OMF file.
+ * ~link.py~ links several OMF modules or libraries together.
+ * ~mkbin.py~ creates a binary file from an OMF file, also adjusting code
+ start and stack size.
+ * ~linkbin.py~ does the two previous steps.
+ * ~omf80.py~ is the library used by the scripts.
