@@ -7,6 +7,16 @@ import pprint
 
 import omf80
 
+def read_int(str):
+    if str is None:
+        return 0
+    if str[-1].lower() == 'h':
+        return int(str[0:-1], 16)
+    elif len(str) > 1 and str[0:2] == '0x':
+        return int(str[2:], 16)
+    else:
+        return int(str, 10)
+
 class HexIntPrettyPrinter(pprint.PrettyPrinter):
     """A PrettyPrinter that formats integers as hex values."""
     def format(self, obj, ctx, maxlvl, level):
