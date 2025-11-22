@@ -1,0 +1,58 @@
+fib:
+do;
+
+declare plm label public;
+
+mon1: procedure (func,info) external;
+    declare func byte;
+    declare info address;
+end mon1;
+
+str$int: procedure (p) byte external;
+    declare p address;
+end str$int;
+
+pr$num: procedure (n) external;
+    declare n byte;
+end pr$num;
+
+newline: procedure external;
+end newline;
+
+terminate: procedure external;
+end terminate;
+
+fib8: procedure (n) byte;
+    declare n byte;
+    declare a byte;
+    declare (x,y) byte;
+    if n < 2 then
+        return n;
+    x = 0;
+    y = 1;
+    do while n > 1;
+        a = x + y;
+        x = y;
+        y = a;
+        n = n - 1;
+    end;
+    return y;
+end fib8;
+
+declare p$tail address initial (80h);
+declare tail based p$tail (1) byte;
+declare i byte;
+declare n byte;
+
+plm:
+    i = 1;
+    do while tail(i) <= ' ';
+        i = i + 1;
+    end;
+
+    n = str$int(.tail(i));
+    call pr$num(fib8(n));
+    call newline;
+    call terminate;
+
+end fib;

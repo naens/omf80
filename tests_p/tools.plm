@@ -1,0 +1,58 @@
+tools:
+do;
+
+declare p$terminate literally '00h';
+declare c$write literally '02h';
+
+mon1: procedure (func,info) external;
+    declare func byte;
+    declare info address;
+end mon1;
+
+str$int: procedure (p) byte public;
+    declare p address;
+    declare s based p (1) byte;
+    declare i byte;
+    declare n byte;
+    n = 0;
+    i = 0;
+    do while s(i) >= '0' and s(i) <= '9';
+        n = n * 10;
+        n = n + s(i) - '0';
+        i = i + 1;
+    end;
+    return n;
+end str$int;
+
+pr$num: procedure (n) public;
+    declare n byte;
+    declare buf (6) byte;
+    declare i byte;
+    if n = 0 then
+        call mon1(c$write, '0');
+    else
+    do;
+        i = 0;
+        do while n <> 0;
+            buf(i) = n mod 10;
+            n = n / 10;
+            i = i + 1;
+        end;
+        do while i <> 0;
+            call mon1(c$write, buf(i-1) + '0');
+            i = i - 1;
+        end;
+    end;
+end pr$num;
+
+newline: procedure public;
+    call mon1(2, 13);
+    call mon1(2, 10);
+end newline;
+
+terminate: procedure public;
+    call mon1(p$terminate, 0);
+end terminate;
+
+
+end tools;
